@@ -105,7 +105,10 @@ function mergeExcelData(eofficeData, directoryData) {
   console.log(`eOffice rows: ${eofficeData.length}`);
   console.log(`Directory rows: ${directoryData.length}`);
 
-  return eofficeData.map((eofficeEmp) => {
+  // Only process employees who have complete directory matches
+  const mergedData = [];
+  
+  eofficeData.forEach((eofficeEmp) => {
     const eofficeMobile = eofficeEmp.Mobile || eofficeEmp.mobile || '';
     const matchingDir = directoryData.find(
       (dirEmp) =>
@@ -113,23 +116,38 @@ function mergeExcelData(eofficeData, directoryData) {
         (eofficeMobile?.toString().trim() || '')
     );
 
-    if (!matchingDir) {
-      console.warn(`No directory match for mobile: ${eofficeMobile}`);
+    // STRICTER: Only include employees with location AND room number (not just any contact info)
+    if (matchingDir && 
+        matchingDir.LOCN && matchingDir.LOCN.trim() !== '' &&
+        matchingDir.PABX && matchingDir.PABX.toString().trim() !== '') {
+      
+      mergedData.push({
+        OrganisationUnit: eofficeEmp['Organisation Unit'] || '',
+        EmpName: eofficeEmp['Employee Name'] || eofficeEmp.Name || '',
+        Designation: eofficeEmp['Designation'] || '',
+        Email: eofficeEmp['E-mail'] || '',
+        Floor: matchingDir.LOCN.trim(),
+        RoomNo: matchingDir.PABX.toString().trim(),
+        Landline: matchingDir.OFFICE?.toString().trim() || '',
+        Department: matchingDir.DESIGNATION || '', // Still stored but hidden from display
+        Unit: eofficeEmp.Post || '',
+        Mobile: eofficeMobile || matchingDir.MOBILE || matchingDir.mobile || '',
+      });
+    } else {
+      // Log why employee was excluded
+      if (!matchingDir) {
+        console.warn(`EXCLUDED: No directory match for mobile: ${eofficeMobile}`);
+      } else if (!matchingDir.LOCN || matchingDir.LOCN.trim() === '') {
+        console.warn(`EXCLUDED: No location info for: ${eofficeEmp['Employee Name']}`);
+      } else if (!matchingDir.PABX || matchingDir.PABX.toString().trim() === '') {
+        console.warn(`EXCLUDED: No room number for: ${eofficeEmp['Employee Name']}`);
+      }
     }
-
-    return {
-      OrganisationUnit: eofficeEmp['Organisation Unit'] || '',
-      EmpName: eofficeEmp['Employee Name'] || eofficeEmp.Name || '',
-      Designation: eofficeEmp['Designation'] || '',
-      Email: eofficeEmp['E-mail'] || '',
-      Floor: matchingDir?.LOCN || '',
-      RoomNo: matchingDir?.PABX || '',
-      Landline: matchingDir?.OFFICE?.toString() || '',
-      Department: matchingDir?.DESIGNATION || '',
-      Unit: eofficeEmp.Post || '',
-      Mobile: eofficeMobile || matchingDir?.MOBILE || matchingDir?.mobile || '',
-    };
   });
+
+  console.log(`✅ Merged directory employees with room numbers: ${mergedData.length}`);
+  console.log(`❌ Excluded employees: ${eofficeData.length - mergedData.length}`);
+  return mergedData;
 }
 
 // Transform CWC API data to match database schema

@@ -7,21 +7,18 @@ const router = express.Router();
 // Enhanced entity extraction for employee search
 function extractEntities(question) {
   const nameMatches = question.match(/([A-Z][a-z]+ [A-Z][a-z]+|[A-Z][a-z]+)/g) || [];
-  const deptMatch = question.match(/department of ([A-Za-z\s]+)/i) || 
-                   question.match(/director of ([A-Za-z\s]+)/i) || 
-                   question.match(/([A-Za-z\s]+) department/i);
+  // Removed department matching - no longer allowing department searches
   const designationMatch = question.match(/(director|engineer|assistant|deputy|chief|member|chairman)/i);
   
   return {
     names: nameMatches,
-    department: deptMatch ? deptMatch[1].trim() : null,
     designation: designationMatch ? designationMatch[1] : null,
     query: question.toLowerCase(),
     fullQuery: question.trim() // Keep the original query for exact matching
   };
 }
 
-// Search employees based on entities
+// Search employees based on entities - now filtered for directory employees only
 async function searchEmployees(entities) {
   let employees = [];
   
@@ -31,19 +28,49 @@ async function searchEmployees(entities) {
   }
   
   try {
-    // First, try exact match on the full query
+    // STRICTER filter: only show employees who have Floor AND RoomNo (actual room assignments)
+    const baseFilter = { 
+      Floor: { $exists: true, $ne: '', $ne: null },
+      RoomNo: { $exists: true, $ne: '', $ne: null }
+    };
+    
+    // Check if the query is a known designation (prioritize exact designation matches)
+    const designationQuery = entities.fullQuery.toLowerCase();
+    if (designationQuery === 'director') {
+      // For "director", match only exact "DIRECTOR" positions - show ALL results
+      const exactDesignation = await Employee.find({
+        ...baseFilter,
+        Designation: /^DIRECTOR$/i
+      });
+      if (exactDesignation.length > 0) {
+        return exactDesignation;
+      }
+    } else if (designationQuery === 'deputy director') {
+      // For "deputy director", match only "DEPUTY DIRECTOR" positions - show ALL results
+      const exactDesignation = await Employee.find({
+        ...baseFilter,
+        Designation: /^DEPUTY DIRECTOR$/i
+      });
+      if (exactDesignation.length > 0) {
+        return exactDesignation;
+      }
+    }
+    
+    // First, try exact match on the full query (names)
     if (entities.fullQuery) {
       const exactMatch = await Employee.find({
+        ...baseFilter,
         EmpName: new RegExp(`^${entities.fullQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i')
-      }).limit(5);
+      });
       
       if (exactMatch.length > 0) {
         employees.push(...exactMatch);
       } else {
         // Try phrase match (contains the exact phrase)
         const phraseMatch = await Employee.find({
+          ...baseFilter,
           EmpName: new RegExp(entities.fullQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
-        }).limit(5);
+        });
         employees.push(...phraseMatch);
       }
     }
@@ -52,43 +79,43 @@ async function searchEmployees(entities) {
     if (employees.length === 0 && entities.names && entities.names.length > 0) {
       for (const name of entities.names) {
         const empByName = await Employee.find({
+          ...baseFilter,
           EmpName: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
-        }).limit(5);
+        });
         employees.push(...empByName);
       }
     }
     
-    // Search by department (only if no name matches found)
-    if (employees.length === 0 && entities.department) {
-      const empByDept = await Employee.find({
-        Department: new RegExp(entities.department, 'i')
-      }).limit(10);
-      employees.push(...empByDept);
-    }
-    
     // Search by designation (only if no other matches found)
     if (employees.length === 0 && entities.designation) {
+      // Use exact match for designations to avoid partial matches
       const empByDesig = await Employee.find({
-        Designation: new RegExp(entities.designation, 'i')
-      }).limit(10);
+        ...baseFilter,
+        Designation: new RegExp(`^${entities.designation}$`, 'i')
+      });
       employees.push(...empByDesig);
     }
     
-    // If still no results, do a broader search
+    // If still no results, do a broader search (removed department search)
     if (employees.length === 0 && entities.query) {
       const generalSearch = await Employee.find({
+        ...baseFilter,
         $or: [
           { EmpName: new RegExp(entities.query, 'i') },
-          { Designation: new RegExp(entities.query, 'i') },
-          { Department: new RegExp(entities.query, 'i') },
           { OrganisationUnit: new RegExp(entities.query, 'i') }
         ]
-      }).limit(10);
+      });
       employees.push(...generalSearch);
     }
     
+    // Filter out any employees without proper room info (extra safety check)
+    const filteredEmployees = employees.filter(emp => 
+      emp.Floor && emp.Floor.trim() !== '' && 
+      emp.RoomNo && emp.RoomNo.trim() !== ''
+    );
+    
     // Remove duplicates and prioritize exact matches
-    const uniqueEmployees = employees.filter((emp, index, self) => 
+    const uniqueEmployees = filteredEmployees.filter((emp, index, self) => 
       index === self.findIndex(e => e._id.toString() === emp._id.toString())
     );
     
@@ -120,7 +147,7 @@ function formatEmployeeInfo(employees) {
   employees.forEach((emp, index) => {
     info += `${index + 1}. ${emp.EmpName}\n`;
     info += `   Designation: ${emp.Designation || 'Not specified'}\n`;
-    info += `   Department: ${emp.Department || 'Not specified'}\n`;
+    // Department line removed - hiding department information
     if (emp.OrganisationUnit) info += `   Unit: ${emp.OrganisationUnit}\n`;
     if (emp.Floor && emp.Floor.trim()) info += `   Location: ${emp.Floor}\n`;
     if (emp.RoomNo && emp.RoomNo.trim()) info += `   Room/Ext: ${emp.RoomNo}\n`;
@@ -178,7 +205,7 @@ router.post('/', async (req, res) => {
     // Fallback: return formatted database information directly
     let reply = dbInfo;
     if (dbAvailable && employees.length === 0) {
-      reply = `I couldn't find any employees matching "${message}". Try searching by:\n- Full name (e.g., "Amitabh Tiwari")\n- Designation (e.g., "Director", "Engineer")\n- Department name\n\nYou can also browse the organizational structure using the menu button.`;
+      reply = `I couldn't find any employees matching "${message}". Try searching by:\n- Full name (e.g., "Amitabh Tiwari")\n- Designation (e.g., "Director", "Engineer")\n- Organization unit\n\nYou can also browse the organizational structure using the menu button.`;
     } else if (!dbAvailable) {
       reply = `Sorry, the employee database is currently not available. Here are some things you can do:\n\n1. Use the organizational structure menu (☰) to browse positions\n2. Try again in a few moments\n3. Contact the reception desk for immediate assistance\n\nThe CWC Connect system will automatically reconnect to the database when it becomes available.`;
     }

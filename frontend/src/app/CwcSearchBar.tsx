@@ -98,14 +98,14 @@ const CwcSearchBar = () => {
         aria-label="CWC Connect employee search"
       >
         <label htmlFor="cwc-search" className="sr-only">
-          Search by name, designation, or department
+          Search by name, designation, or organization unit
         </label>
         <input
           id="cwc-search"
           type="text"
           className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg border border-gray-200 focus:outline-none focus:ring-2 sm:focus:ring-3 focus:ring-blue-300 focus:border-blue-400 text-sm sm:text-base bg-white transition-all duration-200 placeholder-gray-500 text-black"
-          placeholder="Search by name, designation, or department..."
-          aria-label="Search by name, designation, or department"
+          placeholder="Search by name, designation, or organization unit..."
+          aria-label="Search by name, designation, or organization unit"
           value={query}
           onChange={e => setQuery(e.target.value)}
           autoComplete="off"
