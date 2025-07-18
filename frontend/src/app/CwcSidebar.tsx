@@ -2,119 +2,188 @@
 import React, { useState } from "react";
 import { ChevronDownIcon, ChevronRightIcon, UserIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-// Updated mock data for CWC hierarchy (positions and what they are heading, no names)
+// Updated mock data for CWC hierarchy (positions and names)
 const hierarchy = [
   {
     position: "Chairman",
+    name: "Atul Jain",
     heading: "Central Water Commission",
     children: [
       {
-        position: "Member",
-        heading: "D&R Wing",
+        position: "Member (D&R)",
+        name: "Bhopal Singh",
         children: [
           {
-            position: "Chief Engineer",
-            heading: "Design Department",
-            children: [
-              {
-                position: "Director",
-                heading: "Hydrology Directorate",
-                children: [
-                  {
-                    position: "Deputy Director",
-                    heading: "",
-                    children: [
-                      {
-                        position: "Assistant Director",
-                        heading: "",
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            position: "CE (Design EMO)",
+            name: "S. D. Sharma",
+            children: []
           },
           {
-            position: "Chief Engineer",
-            heading: "Flood Management Department",
-            children: [
-              {
-                position: "Director",
-                heading: "Flood Forecasting Directorate",
-                children: [
-                  {
-                    position: "Deputy Director",
-                    heading: "",
-                    children: [
-                      {
-                        position: "Assistant Director",
-                        heading: "",
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            position: "CE (Design NW&S)",
+            name: "Vivek Tripathi",
+            children: []
+          },
+          {
+            position: "CE (PMO)",
+            name: "S. S. Bakshi",
+            children: []
+          },
+          {
+            position: "CE (BPMO)",
+            name: "Bhupinder Singh",
+            children: []
+          },
+          {
+            position: "CE (IMO)",
+            name: "Rakesh Kashyap",
+            children: []
+          },
+          {
+            position: "CE (D&R)",
+            name: "D. S. Chaukar",
+            children: []
+          },
+          {
+            position: "CE (HQ)",
+            name: "B. K. Gangwar",
+            children: []
+          },
+          {
+            position: "CE (P&D)",
+            name: "B. L. Kalpana",
+            children: []
           }
         ]
       },
       {
-        position: "Member",
-        heading: "WP&P Wing",
+        position: "Member (WP&P)",
+        name: "Yogesh Pathankar",
         children: [
           {
-            position: "Chief Engineer",
-            heading: "Project Appraisal Department",
-            children: [
-              {
-                position: "Director",
-                heading: "Project Monitoring Directorate",
-                children: [
-                  {
-                    position: "Deputy Director",
-                    heading: "",
-                    children: [
-                      {
-                        position: "Assistant Director",
-                        heading: "",
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            position: "CE (WP&P)",
+            name: "C. C. Vishwakarma",
+            children: []
+          },
+          {
+            position: "CE (BMIC)",
+            name: "C. E. Singh",
+            children: []
+          },
+          {
+            position: "CE (PMO)",
+            name: "B. P. Pandey",
+            children: []
+          },
+          {
+            position: "CE (PPAO)",
+            name: "Ratna Chaudhari",
+            children: []
+          },
+          {
+            position: "CE (P&IC)",
+            name: "A. K. RIC",
+            children: []
+          },
+          {
+            position: "CE (P&IC)",
+            name: "K. K. Pandit",
+            children: []
+          },
+          {
+            position: "CE (P&IC)",
+            name: "K. K. Singh",
+            children: []
           }
         ]
       },
       {
-        position: "Member",
-        heading: "RM Wing",
+        position: "Member (RM)",
+        name: "Anupam Prasad",
         children: [
           {
-            position: "Chief Engineer",
-            heading: "River Management Department",
-            children: [
-              {
-                position: "Director",
-                heading: "River Data Directorate",
-                children: [
-                  {
-                    position: "Deputy Director",
-                    heading: "",
-                    children: [
-                      {
-                        position: "Assistant Director",
-                        heading: "",
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            position: "Reading Secretary",
+            name: "CE (BBOC)",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "N. K. Ali",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "Rajesh Kumar",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "D. S. Chaukar",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "Aditya Sharma",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Lucknow",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Kolkata",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Patna",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Bhopal",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) New Delhi",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Chandigarh",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Hyderabad",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Bengaluru",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Guwahati",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Ahmedabad",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Pune",
+            children: []
+          },
+          {
+            position: "CE (BBOC)",
+            name: "CE (BBOC) Jaipur",
+            children: []
           }
         ]
       }
@@ -124,7 +193,8 @@ const hierarchy = [
 
 type HierarchyNode = {
   position: string;
-  heading: string;
+  name?: string;
+  heading?: string;
   children?: HierarchyNode[];
 };
 
@@ -153,7 +223,7 @@ const TreeNode: React.FC<{
   const [open, setOpen] = useState(level < 2); // Expand top 2 levels by default
   const hasChildren = node.children && node.children.length > 0;
   return (
-    <div className={`pl-${level * 3} sm:pl-${level * 4} py-0.5 sm:py-1`}> {/* Responsive indent by level */}
+    <div className={`pl-${level * 3} sm:pl-${level * 4} py-0.5 sm:py-1`}>
       <div
         className="flex items-center gap-1.5 sm:gap-2 cursor-pointer select-none hover:bg-blue-50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 transition-colors duration-150 min-h-[36px] sm:min-h-[40px]"
         onClick={() => hasChildren && setOpen((o) => !o)}
@@ -169,7 +239,10 @@ const TreeNode: React.FC<{
         )}
         <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
         <span className="font-semibold text-gray-800 text-xs sm:text-sm leading-tight">{node.position}</span>
-        {node.heading && (
+        {node.name && (
+          <span className="text-gray-600 ml-1 text-xs leading-tight truncate">{node.name}</span>
+        )}
+        {node.heading && !node.name && (
           <span className="text-gray-600 ml-1 text-xs leading-tight truncate">{node.heading}</span>
         )}
       </div>
