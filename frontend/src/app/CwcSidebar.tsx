@@ -18,40 +18,40 @@ const hierarchy = [
             name: "S. D. Sharma",
             children: []
           },
-          {
+              {
             position: "CE (Design NW&S)",
             name: "Vivek Tripathi",
             children: []
           },
-          {
+                  {
             position: "CE (PMO)",
             name: "S. S. Bakshi",
             children: []
           },
-          {
+                      {
             position: "CE (BPMO)",
             name: "Bhupinder Singh",
-            children: []
+                        children: []
           },
           {
             position: "CE (IMO)",
             name: "Rakesh Kashyap",
             children: []
           },
-          {
+              {
             position: "CE (D&R)",
             name: "D. S. Chaukar",
             children: []
           },
-          {
+                  {
             position: "CE (HQ)",
             name: "B. K. Gangwar",
             children: []
           },
-          {
+                      {
             position: "CE (P&D)",
             name: "B. L. Kalpana",
-            children: []
+                        children: []
           }
         ]
       },
@@ -64,7 +64,7 @@ const hierarchy = [
             name: "C. C. Vishwakarma",
             children: []
           },
-          {
+              {
             position: "CE (BMIC)",
             name: "C. E. Singh",
             children: []
@@ -74,7 +74,7 @@ const hierarchy = [
             name: "B. P. Pandey",
             children: []
           },
-          {
+                  {
             position: "CE (PPAO)",
             name: "Ratna Chaudhari",
             children: []
@@ -84,7 +84,7 @@ const hierarchy = [
             name: "A. K. RIC",
             children: []
           },
-          {
+                      {
             position: "CE (P&IC)",
             name: "K. K. Pandit",
             children: []
@@ -92,7 +92,7 @@ const hierarchy = [
           {
             position: "CE (P&IC)",
             name: "K. K. Singh",
-            children: []
+                        children: []
           }
         ]
       },
@@ -125,7 +125,7 @@ const hierarchy = [
             name: "Aditya Sharma",
             children: []
           },
-          {
+              {
             position: "CE (BBOC)",
             name: "CE (BBOC) Lucknow",
             children: []
@@ -145,7 +145,7 @@ const hierarchy = [
             name: "CE (BBOC) Bhopal",
             children: []
           },
-          {
+                  {
             position: "CE (BBOC)",
             name: "CE (BBOC) New Delhi",
             children: []
@@ -160,7 +160,7 @@ const hierarchy = [
             name: "CE (BBOC) Hyderabad",
             children: []
           },
-          {
+                      {
             position: "CE (BBOC)",
             name: "CE (BBOC) Bengaluru",
             children: []
@@ -183,7 +183,7 @@ const hierarchy = [
           {
             position: "CE (BBOC)",
             name: "CE (BBOC) Jaipur",
-            children: []
+                        children: []
           }
         ]
       }

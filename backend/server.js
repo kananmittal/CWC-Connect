@@ -1,5 +1,3 @@
-// backend/server.js
-
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -12,15 +10,32 @@ dotenv.config();
 
 const app = express();
 
+// --- START ADJUSTMENT HERE ---
+// Define your allowed origins dynamically from an environment variable
+// Fallback to localhost for local development
+const allowedOrigins = process.env.FRONTEND_URL ?
+  process.env.FRONTEND_URL.split(',') : // Allows multiple origins if comma-separated
+  ['http://localhost:3000', 'http://localhost:3001'];
+
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow both frontend ports
+  origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
   preflightContinue: false,
   optionsSuccessStatus: 200
 }));
+// --- END ADJUSTMENT HERE ---
+
 app.use(express.json());
 
 // MongoDB Connection with better error handling
@@ -29,7 +44,7 @@ const connectDB = async () => {
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/cwc-connect';
     await mongoose.connect(mongoUri);
     console.log('MongoDB connected successfully');
-    
+
     // Only start employee sync after successful DB connection
     try {
       await startEmployeeSync();
@@ -51,8 +66,8 @@ connectDB();
 // Health check endpoint (before other routes)
 app.get('/api/health', (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'CWC Connect Backend is running',
     database: dbStatus,
     timestamp: new Date().toISOString()
