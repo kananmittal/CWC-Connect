@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const CwcSearchBar = () => {
   const [query, setQuery] = useState("");
@@ -22,7 +23,7 @@ const CwcSearchBar = () => {
     
     try {
       // Use the correct backend port
-      const res = await fetch("http://localhost:5001/api/chatbot", {
+      const res = await fetch(`${BACKEND_URL}/api/chatbot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: trimmed }),
