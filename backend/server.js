@@ -15,7 +15,7 @@ const app = express();
 // Fallback to localhost for local development
 const allowedOrigins = process.env.FRONTEND_URL ?
   process.env.FRONTEND_URL.split(',') : // Allows multiple origins if comma-separated
-  ['http://localhost:3000', 'http://localhost:3001'];
+  ['http://localhost:3000', 'http://localhost:3001', 'https://cwc-connect.vercel.app'];
 
 // Middleware
 app.use(cors({
